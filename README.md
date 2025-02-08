@@ -46,7 +46,7 @@
 #### Подключаемся к серверу (снова) `root@111.222.333.444`(свой IP)
 #### Мы находимся в директории `home`, нам надо на уровень ниже `cd /.`
 #### Теперь заходим `cd /etc/systemd/system/`
-#### Создаем файл `sudo nano FSM_example_bot.service`
+#### Создаем файл `sudo nano elvina_bot.service`
 #### В него вставляем следующие строки:
 `[Unit]`  
 `Description=elvina_bot`  
