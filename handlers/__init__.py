@@ -9,7 +9,10 @@ from .echo import router as echo_router
 
 router = Router(name=__name__)
 router.include_routers(
-    commands_router, menu_router, interview_router)
+interview_router,
+    commands_router,
+    menu_router,
+)
 
 # Allways last - echo
 router.include_router(echo_router)

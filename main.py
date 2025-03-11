@@ -2,29 +2,39 @@ import asyncio
 import logging
 from pathlib import Path
 
+from data import database
+
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
-import loader
+
+from loader import Config
 from handlers import router
 from aiogram import Bot, Dispatcher
 
+from middlewares import DatabaseMiddleware
 
-async def main():
-    if loader.CONFIG:
-        bot = Bot(
-            token=loader.CONFIG['BOT_TOKEN'],
-            default=DefaultBotProperties(parse_mode=ParseMode.HTML)
-        )
-    else:
-        raise ValueError('No token')
-
-    logging.basicConfig(level=logging.INFO,
-                        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+logging.basicConfig(level=logging.INFO,
+                        format='%(asctime)s - %(name)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s',
                         handlers=[
                             logging.FileHandler(Path('logs', 'bot.log')),
                             logging.StreamHandler()
                         ])
-    dp = Dispatcher()
+
+dp = Dispatcher()
+
+async def on_startup():
+    await database.create_database()
+
+
+async def main():
+    dp.startup.register(on_startup)
+
+    bot = Bot(
+        token=Config().get_token(),
+    )
+    bot.default = DefaultBotProperties(parse_mode=ParseMode.HTML)
+
+    dp.update.outer_middleware(DatabaseMiddleware())
     dp.include_router(router)
     await dp.start_polling(bot)
 
