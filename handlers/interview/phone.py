@@ -57,10 +57,15 @@ async def get_contact(message: Message, state: FSMContext, session: AsyncSession
             groups = result.scalars().all()
 
             for group in groups:
-                await message.bot.send_message(
-                    chat_id=group,
-                    text=text
-                )
+                try:
+                    await message.bot.send_message(
+                        chat_id=group,
+                        text=text
+                    )
+                except Exception as e:
+                    logging.error('Ошибка при отправке сообщения')
+                    continue
+
 
         except Exception as e:
             logging.error(f"Ошибка при проверке пользователя: {e}")
