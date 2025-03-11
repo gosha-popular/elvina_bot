@@ -1,5 +1,7 @@
 import asyncio
 import logging
+import os
+from logging.handlers import TimedRotatingFileHandler
 from pathlib import Path
 
 from data import database
@@ -13,17 +15,33 @@ from aiogram import Bot, Dispatcher
 
 from middlewares import DatabaseMiddleware
 
-logging.basicConfig(level=logging.INFO,
-                        format='%(asctime)s - %(name)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s',
-                        handlers=[
-                            logging.FileHandler(Path('logs', 'bot.log')),
-                            logging.StreamHandler()
-                        ])
-
 dp = Dispatcher()
 
 async def on_startup():
     await database.create_database()
+
+    log_dir = Path('logs')
+    if not log_dir.exists():
+        log_dir.mkdir()
+
+
+    handler = TimedRotatingFileHandler(
+        filename=os.path.join(log_dir, 'bot'),
+        when='D',  # 'midnight',
+        interval=1,
+        backupCount=7,
+        encoding='utf-8'
+    )
+    handler.suffix = "%Y-%m-%d_%H-%M-%S"
+    handler.namer = lambda x: x + '.log'
+
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s',
+        handlers=[
+            handler, logging.StreamHandler()
+        ]
+    )
 
 
 async def main():
