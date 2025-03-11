@@ -29,17 +29,19 @@ async def start(message: Message, state: FSMContext):
 
 
 @router.message()
-async def input_my_name_is(message: Message, session: AsyncSession):
+async def input_my_name_is(message: Message, state: FSMContext, session: AsyncSession):
     user = message.from_user
     await add_user(user, session)
     await start_message(message, user.first_name)
+    await state.clear()
 
 @router.callback_query()
-async def callback_my_name_is(callback: CallbackQuery, session: AsyncSession):
+async def callback_my_name_is(callback: CallbackQuery, state: FSMContext, session: AsyncSession):
     await callback.answer()
     user = callback.from_user
     await add_user(user, session)
     await start_message(callback.message, user.first_name)
+    await state.clear()
 
 async def add_user(user, session):
     try:
