@@ -69,14 +69,13 @@ async def get_contact(message: Message, state: FSMContext, session: AsyncSession
 
         except Exception as e:
             logging.error(f"Ошибка при проверке пользователя: {e}")
-
-
-        _message = await message.answer(
-            text = '✅ Отлично! Ваша заявка принята. Менеджер свяжется с Вами в ближайшее время',
-            reply_markup=ReplyKeyboardRemove()
-        )
-        await message.delete()
-        await asyncio.sleep(1)
-        await main_menu(_message, state)
-        await state.clear()
+        finally:
+            _message = await message.answer(
+                text = '✅ Отлично! Ваша заявка принята. Менеджер свяжется с Вами в ближайшее время',
+                reply_markup=ReplyKeyboardRemove()
+            )
+            await message.delete()
+            await asyncio.sleep(1)
+            await main_menu(_message, state)
+            await state.clear()
 
