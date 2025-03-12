@@ -1,3 +1,4 @@
+import html
 from pathlib import Path
 
 from aiogram import Router, F
@@ -17,7 +18,7 @@ hello_message = '''👋 Приветствуем Вас, {user}!\n
 async def start_message(message: Message, name):
     await message.answer(
         text=hello_message.format(
-            user=name
+            user=html.escape(name)
         )
     )
     await main_menu(message)

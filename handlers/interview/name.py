@@ -1,3 +1,4 @@
+import html
 import logging
 
 from aiogram import Router, F
@@ -19,7 +20,7 @@ async def start(message: Message, state: FSMContext):
     text = '''👋 Приветствуем Вас!\nДавайте познакомимся. Как Вас зовут?'''
 
     builder = InlineKeyboardBuilder()
-    builder.button(text=f'Меня зовут {message.from_user.first_name}!', callback_data=message.from_user.first_name)
+    builder.button(text=f'Меня зовут {html.escape(message.from_user.first_name)}!', callback_data=message.from_user.first_name)
 
     await state.set_state(Interview.name)
     await message.answer(
@@ -30,9 +31,9 @@ async def start(message: Message, state: FSMContext):
 
 @router.message()
 async def input_my_name_is(message: Message, state: FSMContext, session: AsyncSession):
-    user = message.from_user
+    user = message.text
     await add_user(user, session)
-    await start_message(message, user.first_name)
+    await start_message(message, user)
     await state.clear()
 
 @router.callback_query()
@@ -40,7 +41,7 @@ async def callback_my_name_is(callback: CallbackQuery, state: FSMContext, sessio
     await callback.answer()
     user = callback.from_user
     await add_user(user, session)
-    await start_message(callback.message, user.first_name)
+    await start_message(callback.message, callback.data)
     await state.clear()
 
 async def add_user(user, session):
