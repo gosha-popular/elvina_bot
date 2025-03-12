@@ -6,6 +6,7 @@ from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, KeyboardButton, ReplyKeyboardRemove
 from aiogram.utils.keyboard import ReplyKeyboardMarkup
+from icecream import ic
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from data.database import User, get_user, Group
@@ -29,11 +30,11 @@ async def ask_phone(state: FSMContext):
     )
     await message.delete()
 
-    await state.update_data(question=question, message = _message)
+    await state.update_data(question=question, message=_message)
+
 
 @router.message(F.text | F.contact, StateFilter(Interview.phone))
 async def get_contact(message: Message, state: FSMContext, session: AsyncSession):
-
     _message = await state.get_value('message', None)
     question = await state.get_value('question', None)
     answers = await state.get_value('answers', {})
@@ -57,25 +58,19 @@ async def get_contact(message: Message, state: FSMContext, session: AsyncSession
             groups = result.scalars().all()
 
             for group in groups:
-                try:
-                    await message.bot.send_message(
-                        chat_id=group,
-                        text=text
-                    )
-                except Exception as e:
-                    logging.error('Ошибка при отправке сообщения')
-                    continue
-
+                await message.bot.send_message(
+                    chat_id=group,
+                    text=text
+                )
 
         except Exception as e:
             logging.error(f"Ошибка при проверке пользователя: {e}")
         finally:
+            ic('Тут вообще происходит что то?')
             _message = await message.answer(
-                text = '✅ Отлично! Ваша заявка принята. Менеджер свяжется с Вами в ближайшее время',
+                text='✅ Отлично! Ваша заявка принята. Менеджер свяжется с Вами в ближайшее время',
                 reply_markup=ReplyKeyboardRemove()
             )
-            await message.delete()
             await asyncio.sleep(1)
-            await main_menu(_message, state)
+            await main_menu(message, state)
             await state.clear()
-

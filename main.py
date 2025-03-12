@@ -35,7 +35,7 @@ async def on_startup():
     handler.namer = lambda x: x + '.log'
 
     logging.basicConfig(
-        level=logging.DEBUG,
+        level=logging.INFO,
         format='%(asctime)s - %(name)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s',
         handlers=[
             handler, StreamHandler()
