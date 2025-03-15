@@ -47,8 +47,8 @@ async def adding_group(message: Message):
 
 @router.message(Command('add_admin'))
 async def assign_an_admin(message: Message, command: CommandObject):
-    user = ()
-
+    _id = command.args
+    # TODO: Не реализованная функция
     await message.answer(
         text='[name] назначен администратором'
     )
@@ -61,6 +61,7 @@ async def assign_an_admin(message: Message, command: CommandObject):
 
 @router.message(Command('del_admin'))
 async def assign_an_admin(message: Message, command: CommandObject):
+    # TODO: Не реализованная функция
     await message.answer(
         text='[name] разжалован'
     )
@@ -71,7 +72,7 @@ class SetQuestion(StatesGroup):
     answer = State()
 
 
-@router.message(Command('add_q'))
+@router.message(Command('add_question'))
 async def add_question(message: Message, command: CommandObject, state: FSMContext):
     await state.clear()
     logging.info('''Call command add_question, arguments {}. Called admin - {}'''.format(

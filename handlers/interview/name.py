@@ -1,3 +1,19 @@
+"""
+[RU]
+Модуль обработки получения имени пользователя.
+
+Управляет процессом запроса и получения имени пользователя,
+предлагает использовать имя из профиля Telegram или ввести другое имя.
+Сохраняет информацию о пользователе в базе данных.
+
+[EN]
+Module for handling username acquisition.
+
+Manages the process of requesting and receiving username,
+offers to use name from Telegram profile or enter different name.
+Saves user information in the database.
+"""
+
 import html
 import logging
 
@@ -17,6 +33,27 @@ router.message.filter(StateFilter(Interview.name))
 router.callback_query.filter(StateFilter(Interview.name))
 
 async def start(message: Message, state: FSMContext):
+    """
+    [RU]
+    Начинает диалог знакомства с пользователем.
+    
+    Отправляет приветственное сообщение и предлагает использовать
+    имя из профиля Telegram.
+
+    Args:
+        message (Message): Объект сообщения Telegram
+        state (FSMContext): Контекст состояния FSM
+
+    [EN]
+    Starts the greeting dialogue with user.
+    
+    Sends welcome message and offers to use name
+    from Telegram profile.
+
+    Args:
+        message (Message): Telegram message object
+        state (FSMContext): FSM state context
+    """
     text = '''👋 Приветствуем Вас!\nДавайте познакомимся. Как Вас зовут?'''
 
     builder = InlineKeyboardBuilder()
@@ -31,6 +68,27 @@ async def start(message: Message, state: FSMContext):
 
 @router.message()
 async def input_my_name_is(message: Message, state: FSMContext, session: AsyncSession):
+    """
+    [RU]
+    Обрабатывает введенное пользователем имя.
+    
+    Сохраняет имя пользователя и переходит к главному меню.
+
+    Args:
+        message (Message): Объект сообщения Telegram
+        state (FSMContext): Контекст состояния FSM
+        session (AsyncSession): Сессия базы данных
+
+    [EN]
+    Processes user-entered name.
+    
+    Saves username and proceeds to main menu.
+
+    Args:
+        message (Message): Telegram message object
+        state (FSMContext): FSM state context
+        session (AsyncSession): Database session
+    """
     user = message.text
     await add_user(user, session)
     await start_message(message, user)
@@ -38,6 +96,27 @@ async def input_my_name_is(message: Message, state: FSMContext, session: AsyncSe
 
 @router.callback_query()
 async def callback_my_name_is(callback: CallbackQuery, state: FSMContext, session: AsyncSession):
+    """
+    [RU]
+    Обрабатывает выбор имени из профиля Telegram.
+    
+    Сохраняет имя пользователя и переходит к главному меню.
+
+    Args:
+        callback (CallbackQuery): Объект callback запроса
+        state (FSMContext): Контекст состояния FSM
+        session (AsyncSession): Сессия базы данных
+
+    [EN]
+    Processes name selection from Telegram profile.
+    
+    Saves username and proceeds to main menu.
+
+    Args:
+        callback (CallbackQuery): Callback query object
+        state (FSMContext): FSM state context
+        session (AsyncSession): Database session
+    """
     await callback.answer()
     user = callback.from_user
     await add_user(user, session)
@@ -45,6 +124,21 @@ async def callback_my_name_is(callback: CallbackQuery, state: FSMContext, sessio
     await state.clear()
 
 async def add_user(user, session):
+    """
+    [RU]
+    Добавляет информацию о пользователе в базу данных.
+
+    Args:
+        user: Объект пользователя Telegram
+        session: Сессия базы данных
+
+    [EN]
+    Adds user information to database.
+
+    Args:
+        user: Telegram user object
+        session: Database session
+    """
     try:
         session.add(User(
             id=user.id,

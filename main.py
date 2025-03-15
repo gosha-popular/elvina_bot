@@ -1,3 +1,17 @@
+"""
+[RU]
+Основной файл запуска Telegram-бота для автоворонки продаж.
+
+Этот модуль инициализирует и запускает бота, настраивает логирование
+и подключает все необходимые компоненты (роутеры, middleware).
+
+[EN]
+Main file for launching the Telegram bot for sales funnel automation.
+
+This module initializes and launches the bot, configures logging,
+and connects all necessary components (routers, middleware).
+"""
+
 import asyncio
 import logging
 import os
@@ -19,6 +33,19 @@ from middlewares import DatabaseMiddleware
 dp = Dispatcher()
 
 async def on_startup():
+    """
+    [RU]
+    Функция, выполняемая при запуске бота.
+    
+    Создает директорию для логов если она не существует и настраивает систему логирования.
+    Также инициализирует базу данных.
+
+    [EN]
+    Function executed when the bot starts.
+    
+    Creates a log directory if it doesn't exist and configures the logging system.
+    Also initializes the database.
+    """
     log_dir = Path('logs')
     if not log_dir.exists():
         log_dir.mkdir()
@@ -46,6 +73,19 @@ async def on_startup():
 
 
 async def main():
+    """
+    [RU]
+    Основная функция запуска бота.
+    
+    Регистрирует обработчик запуска, инициализирует бота с настройками,
+    подключает middleware и роутеры, запускает поллинг обновлений.
+
+    [EN]
+    Main bot launch function.
+    
+    Registers startup handler, initializes bot with settings,
+    connects middleware and routers, starts update polling.
+    """
     dp.startup.register(on_startup)
 
     bot = Bot(

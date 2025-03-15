@@ -1,3 +1,19 @@
+"""
+[RU]
+Модуль обработки главного меню бота.
+
+Содержит обработчики для основных разделов бота: главное меню,
+контакты, примеры работ и заказ сайта. Управляет навигацией и
+отображением информации пользователю.
+
+[EN]
+Bot main menu handling module.
+
+Contains handlers for main bot sections: main menu,
+contacts, work examples and site ordering. Manages navigation
+and information display to the user.
+"""
+
 import html
 from pathlib import Path
 
@@ -16,6 +32,21 @@ hello_message = '''👋 Приветствуем Вас, {user}!\n
 
 
 async def start_message(message: Message, name):
+    """
+    [RU]
+    Отправляет приветственное сообщение и показывает главное меню.
+
+    Args:
+        message (Message): Объект сообщения Telegram
+        name (str): Имя пользователя для приветствия
+
+    [EN]
+    Sends welcome message and shows main menu.
+
+    Args:
+        message (Message): Telegram message object
+        name (str): Username for greeting
+    """
     await message.answer(
         text=hello_message.format(
             user=html.escape(name)
@@ -25,6 +56,21 @@ async def start_message(message: Message, name):
 
 
 async def main_menu(message: Message, state: FSMContext = None):
+    """
+    [RU]
+    Отображает главное меню бота.
+
+    Args:
+        message (Message): Объект сообщения Telegram
+        state (FSMContext, optional): Контекст состояния FSM
+
+    [EN]
+    Displays bot main menu.
+
+    Args:
+        message (Message): Telegram message object
+        state (FSMContext, optional): FSM state context
+    """
     if state:
         await state.clear()
 
@@ -42,11 +88,41 @@ async def main_menu(message: Message, state: FSMContext = None):
 
 @router.callback_query(F.data.casefold().contains('главное меню'))
 async def get_menu(callback: CallbackQuery, state: FSMContext):
+    """
+    [RU]
+    Обработчик возврата в главное меню.
+
+    Args:
+        callback (CallbackQuery): Объект callback запроса
+        state (FSMContext): Контекст состояния FSM
+
+    [EN]
+    Handler for returning to main menu.
+
+    Args:
+        callback (CallbackQuery): Callback query object
+        state (FSMContext): FSM state context
+    """
     await main_menu(message=callback.message, state=state)
 
 
 @router.callback_query(F.data.casefold().contains('наши контакты'))
 async def main_contact(callback: CallbackQuery, state: FSMContext):
+    """
+    [RU]
+    Отображает контактную информацию.
+
+    Args:
+        callback (CallbackQuery): Объект callback запроса
+        state (FSMContext): Контекст состояния FSM
+
+    [EN]
+    Displays contact information.
+
+    Args:
+        callback (CallbackQuery): Callback query object
+        state (FSMContext): FSM state context
+    """
     await state.clear()
 
     builder = InlineKeyboardBuilder()
@@ -65,6 +141,21 @@ async def main_contact(callback: CallbackQuery, state: FSMContext):
 
 @router.callback_query(F.data.casefold().contains('примеры работ'))
 async def main_reference(callback: CallbackQuery, state: FSMContext):
+    """
+    [RU]
+    Отображает категории примеров работ.
+
+    Args:
+        callback (CallbackQuery): Объект callback запроса
+        state (FSMContext): Контекст состояния FSM
+
+    [EN]
+    Displays work examples categories.
+
+    Args:
+        callback (CallbackQuery): Callback query object
+        state (FSMContext): FSM state context
+    """
     await state.clear()
     await state.set_state(Reference.view)
 
@@ -90,6 +181,21 @@ async def main_reference(callback: CallbackQuery, state: FSMContext):
 
 @router.callback_query(F.data.casefold().contains('заказать сайт'))
 async def main_order(callback: CallbackQuery, state: FSMContext):
+    """
+    [RU]
+    Начинает процесс заказа сайта.
+
+    Args:
+        callback (CallbackQuery): Объект callback запроса
+        state (FSMContext): Контекст состояния FSM
+
+    [EN]
+    Starts the website ordering process.
+
+    Args:
+        callback (CallbackQuery): Callback query object
+        state (FSMContext): FSM state context
+    """
     await state.clear()
     await state.set_state(Interview.question)
     await state.update_data(message=callback.message,)
@@ -100,6 +206,19 @@ async def main_order(callback: CallbackQuery, state: FSMContext):
 
 @router.callback_query(Reference.view, ~F.data.contains('Назад'))
 async def view_reference(callback: CallbackQuery):
+    """
+    [RU]
+    Показывает примеры работ выбранной категории.
+
+    Args:
+        callback (CallbackQuery): Объект callback запроса
+
+    [EN]
+    Shows work examples for selected category.
+
+    Args:
+        callback (CallbackQuery): Callback query object
+    """
     directory = None
 
     if callback.data == "🚗 Автомобили":
@@ -134,4 +253,19 @@ async def view_reference(callback: CallbackQuery):
 
 @router.callback_query(Reference.view, F.data.contains('Назад'))
 async def view_reference(callback: CallbackQuery, state: FSMContext):
+    """
+    [RU]
+    Обработчик возврата к списку категорий примеров работ.
+
+    Args:
+        callback (CallbackQuery): Объект callback запроса
+        state (FSMContext): Контекст состояния FSM
+
+    [EN]
+    Handler for returning to work examples categories list.
+
+    Args:
+        callback (CallbackQuery): Callback query object
+        state (FSMContext): FSM state context
+    """
     await main_reference(callback, state)
